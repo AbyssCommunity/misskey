@@ -13,7 +13,8 @@ import { RoleService } from '@/core/RoleService.js';
 import { ApiError } from '../../error.js';
 import { MiMeta } from '@/models/_.js';
 import { DI } from '@/di-symbols.js';
-
+import { OpenAI } from 'openai';
+import * as Redis from 'ioredis';
 export const meta = {
 	tags: ['notes'],
 
@@ -63,6 +64,9 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		@Inject(DI.meta)
 		private serverSettings: MiMeta,
 
+	        @Inject(DI.redis)
+	        private redisClient: Redis.Redis,
+	    
 		private noteEntityService: NoteEntityService,
 		private getterService: GetterService,
 		private httpRequestService: HttpRequestService,
@@ -86,6 +90,13 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (note.text == null) {
 				return;
 			}
+		        if (this.serverSettings.enableLLMTranslator) {
+				const res = await this.LLMTranslate(note.text, ps.targetLang, note.id);
+				return {
+					text: res,
+				};
+			}
+
 
 			if (this.serverSettings.deeplAuthKey == null) {
 				throw new ApiError(meta.errors.unavailable);
@@ -122,5 +133,44 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				text: json.translations[0].text,
 			};
 		});
+	}
+        private async LLMTranslate(text: string, targetLang: string, noteId: string): Promise<string> {
+		if (this.serverSettings.enableLLMTranslatorRedisCache) {
+			const key = `LLMTranslate:${targetLang}:${noteId}`;
+			const cached = await this.redisClient.get(key);
+			if (cached != null) {
+				this.redisClient.expire(key, this.serverSettings.LLMTranslatorRedisCacheTtl * 60);
+				return cached;
+			}
+			const res = await this.getLLMRes(text, targetLang);
+			await this.redisClient.set(key, res);
+			this.redisClient.expire(key, this.serverSettings.LLMTranslatorRedisCacheTtl * 60);
+			return res;
+		} else {
+			return this.getLLMRes(text, targetLang);
+		}
+	}
+
+	private async getLLMRes(text: string, targetLang: string): Promise<string> {
+		const client = new OpenAI({
+			baseURL: this.serverSettings.LLMTranslatorBaseUrl,
+			apiKey: this.serverSettings.LLMTranslatorApiKey ?? '',
+		});
+		const message = [];
+		if (this.serverSettings.LLMTranslatorSysPrompt) {
+			message.push({ role: 'system' as const, content: this.serverSettings.LLMTranslatorSysPrompt.replace('{targetLang}', targetLang).replace('{text}', text) });
+		}
+		if (this.serverSettings.LLMTranslatorUserPrompt) {
+			message.push({ role: 'user' as const, content: this.serverSettings.LLMTranslatorUserPrompt.replace('{targetLang}', targetLang).replace('{text}', text) });
+		}
+		const completion = await client.chat.completions.create({
+			messages: message,
+			model: this.serverSettings.LLMTranslatorModel ?? '',
+			temperature: this.serverSettings.LLMTranslatorTemperature,
+			max_tokens: this.serverSettings.LLMTranslatorMaxTokens,
+			top_p: this.serverSettings.LLMTranslatorTopP,
+		});
+
+		return completion.choices[0].message.content ?? '';
 	}
 }

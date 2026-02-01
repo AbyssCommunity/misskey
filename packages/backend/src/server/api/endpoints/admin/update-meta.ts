@@ -187,6 +187,17 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+	        enableLLMTranslator: { type: 'boolean' },
+		enableLLMTranslatorRedisCache: { type: 'boolean' },
+		LLMTranslatorRedisCacheTtl: { type: 'integer' },
+		LLMTranslatorBaseUrl: { type: 'string', nullable: true },
+		LLMTranslatorApiKey: { type: 'string', nullable: true },
+		LLMTranslatorModel: { type: 'string', nullable: true },
+		LLMTranslatorTemperature: { type: 'number' },
+		LLMTranslatorTopP: { type: 'number' },
+		LLMTranslatorMaxTokens: { type: 'integer'},
+		LLMTranslatorSysPrompt: { type: 'string', nullable: true },
+		LLMTranslatorUserPrompt: { type: 'string', nullable: true },
 		deliverSuspendedSoftware: {
 			type: 'array',
 			items: {
@@ -710,6 +721,69 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (Array.isArray(ps.federationHosts)) {
 				set.federationHosts = ps.federationHosts.filter(Boolean).map(x => x.toLowerCase());
+			}
+		        if (ps.enableLLMTranslator !== undefined) {
+				set.enableLLMTranslator = ps.enableLLMTranslator;
+			}
+
+			if (ps.enableLLMTranslatorRedisCache !== undefined) {
+				set.enableLLMTranslatorRedisCache = ps.enableLLMTranslatorRedisCache;
+			}
+
+			if (ps.LLMTranslatorRedisCacheTtl !== undefined) {
+				set.LLMTranslatorRedisCacheTtl = ps.LLMTranslatorRedisCacheTtl;
+			}
+
+			if (ps.LLMTranslatorBaseUrl !== undefined) {
+				if (ps.LLMTranslatorBaseUrl === '') {
+					set.LLMTranslatorBaseUrl = null;
+				} else {
+					set.LLMTranslatorBaseUrl = ps.LLMTranslatorBaseUrl;
+				}
+			}
+
+			if (ps.LLMTranslatorApiKey !== undefined) {
+				if (ps.LLMTranslatorApiKey === '') {
+					set.LLMTranslatorApiKey = null;
+				} else {
+					set.LLMTranslatorApiKey = ps.LLMTranslatorApiKey;
+				}
+			}
+
+			if (ps.LLMTranslatorModel !== undefined) {
+				if (ps.LLMTranslatorModel === '') {
+					set.LLMTranslatorModel = null;
+				} else {
+					set.LLMTranslatorModel = ps.LLMTranslatorModel;
+				}
+			}
+
+			if (ps.LLMTranslatorTemperature !== undefined) {
+				set.LLMTranslatorTemperature = ps.LLMTranslatorTemperature;
+			}
+
+			if (ps.LLMTranslatorTopP !== undefined) {
+				set.LLMTranslatorTopP = ps.LLMTranslatorTopP;
+			}
+
+			if (ps.LLMTranslatorMaxTokens !== undefined) {
+				set.LLMTranslatorMaxTokens = ps.LLMTranslatorMaxTokens;
+			}
+
+			if (ps.LLMTranslatorSysPrompt !== undefined) {
+				if (ps.LLMTranslatorSysPrompt === '') {
+					set.LLMTranslatorSysPrompt = null;
+				} else {
+					set.LLMTranslatorSysPrompt = ps.LLMTranslatorSysPrompt;
+				}
+			}
+
+			if (ps.LLMTranslatorUserPrompt !== undefined) {
+				if (ps.LLMTranslatorUserPrompt === '') {
+					set.LLMTranslatorUserPrompt = null;
+				} else {
+					set.LLMTranslatorUserPrompt = ps.LLMTranslatorUserPrompt;
+				}
 			}
 
 			if (ps.singleUserMode !== undefined) {

@@ -9478,6 +9478,17 @@ export interface operations {
                         /** @enum {string} */
                         federation: 'all' | 'specified' | 'none';
                         federationHosts: string[];
+			enableLLMTranslator: boolean;
+			enableLLMTranslatorRedisCache: boolean;
+			LLMTranslatorRedisCacheTtl: number;
+			LLMTranslatorBaseUrl: string | null;
+			LLMTranslatorApiKey: string | null;
+			LLMTranslatorModel: string | null;
+			LLMTranslatorTemperature: number;
+			LLMTranslatorTopP: number;
+			LLMTranslatorMaxTokens: number;
+			LLMTranslatorSysPrompt: string | null;
+			LLMTranslatorUserPrompt: string | null;
                         deliverSuspendedSoftware: {
                             software: string;
                             versionRange: string;
@@ -12799,6 +12810,17 @@ export interface operations {
                     /** @enum {string} */
                     federation?: 'all' | 'none' | 'specified';
                     federationHosts?: string[];
+		    enableLLMTranslator?: boolean;
+		    enableLLMTranslatorRedisCache?: boolean;
+		    LLMTranslatorRedisCacheTtl?: number;
+		    LLMTranslatorBaseUrl?: string | null;
+		    LLMTranslatorApiKey?: string | null;
+		    LLMTranslatorModel?: string | null;
+		    LLMTranslatorTemperature?: number;
+		    LLMTranslatorTopP?: number;
+		    LLMTranslatorMaxTokens?: number;
+		    LLMTranslatorSysPrompt?: string | null;
+		    LLMTranslatorUserPrompt?: string | null;
                     deliverSuspendedSoftware?: {
                         software: string;
                         versionRange: string;
