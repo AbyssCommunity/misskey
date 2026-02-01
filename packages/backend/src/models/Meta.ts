@@ -677,6 +677,69 @@ export class MiMeta {
 	})
 	public googleAnalyticsMeasurementId: string | null;
 
+        @Column('boolean', {
+		default: false,
+	})
+	public enableLLMTranslator: boolean;
+
+	@Column('boolean', {
+		default: false,
+	})
+	public enableLLMTranslatorRedisCache: boolean;
+
+	@Column('integer', {
+		default: 2880,
+	})
+	public LLMTranslatorRedisCacheTtl: number;
+
+	@Column('varchar', {
+		length: 1024,
+		nullable: true,
+	})
+	public LLMTranslatorBaseUrl: string | null;
+
+	@Column('varchar', {
+		length: 1024,
+		nullable: true,
+	})
+	public LLMTranslatorApiKey: string | null;
+
+	@Column('varchar', {
+		length: 1024,
+		nullable: true,
+	})
+	public LLMTranslatorModel: string | null;
+
+	@Column('real', {
+	        nullable: true,
+    	        default: 0.2,
+	})
+	public LLMTranslatorTemperature: number;
+
+	@Column('real', {
+	        nullable: true,
+   	        default: 1,
+	})
+	public LLMTranslatorTopP: number;
+
+	@Column('integer', {
+	        nullable: true,
+    	        default: 4096
+	})
+	public LLMTranslatorMaxTokens: number;
+
+	@Column('varchar', {
+		length: 1024,
+		nullable: true,
+	})
+	public LLMTranslatorSysPrompt: string | null;
+
+	@Column('varchar', {
+		length: 1024,
+		nullable: true,
+	})
+        public LLMTranslatorUserPrompt: string | null;
+    
 	@Column('jsonb', {
 		default: [],
 	})
